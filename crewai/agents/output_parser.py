@@ -52,8 +52,7 @@ class CrewAgentOutputParser(ReActSingleInputOutputParser):
         regex = (
             r"Action\s*\d*\s*:[\s]*(.*?)[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         )
-        action_match = re.search(regex, text, re.DOTALL)
-        if action_match:
+        if action_match := re.search(regex, text, re.DOTALL):
             if includes_answer:
                 raise OutputParserException(
                     f"{FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE}: {text}"
@@ -63,8 +62,7 @@ class CrewAgentOutputParser(ReActSingleInputOutputParser):
             tool_input = action_input.strip(" ")
             tool_input = tool_input.strip('"')
 
-            last_tool_usage = self.tools_handler.last_used_tool
-            if last_tool_usage:
+            if last_tool_usage := self.tools_handler.last_used_tool:
                 usage = {
                     "tool": action,
                     "input": tool_input,
@@ -74,8 +72,7 @@ class CrewAgentOutputParser(ReActSingleInputOutputParser):
                         f"""\nI just used the {action} tool with input {tool_input}. So I already knwo the result of that."""
                     )
 
-            result = self.cache.read(action, tool_input)
-            if result:
+            if result := self.cache.read(action, tool_input):
                 return AgentFinish({"output": result}, text)
 
         return super().parse(text)
